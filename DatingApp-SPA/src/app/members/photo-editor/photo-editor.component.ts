@@ -84,6 +84,7 @@ export class PhotoEditorComponent implements OnInit {
             JSON.stringify(this.authService.currentUser)
           );
         },
+        // tslint:disable-next-line: no-shadowed-variable
         error => {
           this.alertify.error(error);
         }
