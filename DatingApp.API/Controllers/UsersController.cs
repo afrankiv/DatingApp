@@ -26,7 +26,9 @@ namespace DatingApp.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
+            // ARCH: Repository Interface Access -> Returns ORM model, but var hides the typing
             var users = await _repo.GetUsers();
+            // ARCH: Maps ORM Models into DTOs, but DTO is designed for the use case
             var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
 
             return Ok(usersToReturn);
@@ -35,7 +37,9 @@ namespace DatingApp.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
+            // ARCH: Repository Interface Access -> Returns ORM model, but var hides the typing
             var user = await _repo.GetUser(id);
+            // ARCH: Maps ORM Models into DTOs, but DTO is designed for the use case
             var userToReturn = _mapper.Map<UserForDetailedDto>(user);
 
             return Ok(userToReturn);
@@ -47,9 +51,12 @@ namespace DatingApp.API.Controllers
             if (id != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
 
+            // ARCH: Repository Interface Access -> Returns ORM model, but var hides the typing
             var userFromRepo = await _repo.GetUser(id);
+            // ARCH: Maps ORM Models into DTOs, but DTO is designed for the use case
             _mapper.Map(userForUpdateDto, userFromRepo);
 
+            // ARCH: Repository Interface Access
             if (await _repo.SaveAll())
                 return NoContent();
 
