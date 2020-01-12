@@ -10,9 +10,11 @@
     </div>
   </div>
   <div class="row">
+    <!--User data read only info-->
     <div class="col-sm-4">
       <div class="card">
-        <img class="card-img-top img-thumbnail" src="{{photoUrl}}" alt="{{user.knownAs}}" />
+        <img class="card-img-top img-thumbnail" src="{{ photoUrl || '../../../../../assets/user.png' }}"
+          alt="{{user.knownAs}}" />
         <div class="card-body">
           <div>
             <strong>Location: </strong>
@@ -36,6 +38,7 @@
         </div>
       </div>
     </div>
+    <!--Editor for user data-->
     <div class="col-sm-8">
       <div class="tab-panel">
         <tabset class="member-tabset">
@@ -58,7 +61,10 @@
           </tab>
           <tab heading="Edit Photos">
             <p>
-              <app-photo-editor [photos]="user.photos" (getMemberPhotoChange)="updateMainPhoto($event)">
+              <!--Photo Editor with upload photo functionality-->
+              <app-photo-editor 
+                [photos]="user.photos" 
+                (getMemberPhotoChange)="updateMainPhoto($event)">
               </app-photo-editor>
             </p>
           </tab>

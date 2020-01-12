@@ -33,19 +33,22 @@ namespace DatingApp.API.Controllers
         {
             userForRegisterDto.Username = userForRegisterDto.Username.ToLower();
 
-            // Business Logic Access
+            // Business Logic Access: Validates user through the repository
             if (await _repo.UserExists(userForRegisterDto.Username))
                 return BadRequest("User already exists");
 
-            var userToCreate = new User
-            {
-                Username = userForRegisterDto.Username
-            };
+            // MAPPING from DTO to ORM model
+            var userToCreate = _mapper.Map<User>(userForRegisterDto);
 
-            // Business Logic Access
+            // ARCH: Repository Interface Access -> Returns ORM model, but var hides the typing
+            // Register new user in database
             var createdUser = await _repo.Register(userToCreate, userForRegisterDto.Password);
 
-            return StatusCode(201);
+            // MAPPING from ORM to DTO model
+            var userToReturn = _mapper.Map<UserForDetailedDto>(createdUser);
+
+            // Returns 201 Created Status + UserForDetailedDto + Location http://localhost:5000/api/Users/11
+            return CreatedAtRoute("GetUser", new { controller = "Users", id = createdUser.Id }, userToReturn);
         }
 
         [HttpPost("login")]

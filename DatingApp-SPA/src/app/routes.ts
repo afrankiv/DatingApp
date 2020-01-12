@@ -12,7 +12,9 @@ import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
 
 export const appRoutes: Routes = [
+  // Case: Empty URL will go to home page
   { path: '', component: HomeComponent },
+  // Case: Empty home, but with children
   {
     path: '',
     runGuardsAndResolvers: 'always',
@@ -38,5 +40,6 @@ export const appRoutes: Routes = [
       { path: 'lists', component: ListsComponent }
     ]
   },
+  // Case: Invalid URL will redirect to home page
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

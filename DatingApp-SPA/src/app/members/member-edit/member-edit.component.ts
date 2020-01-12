@@ -12,10 +12,15 @@ import { AuthService } from 'src/app/_services/auth.service';
   styleUrls: ['./member-edit.component.css']
 })
 export class MemberEditComponent implements OnInit {
+  // Edit user data form
   @ViewChild('editForm', { static: true }) editForm: NgForm;
   user: User;
   photoUrl: string;
 
+  /**
+   * Listens to window url changes to prevent user from unsaved data.
+   * @param $event Before window unload event.
+   */
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
     if (this.editForm.dirty) {
@@ -30,6 +35,12 @@ export class MemberEditComponent implements OnInit {
     private authService: AuthService
   ) {}
 
+  /**
+   * A callback method that is invoked immediately after the default change detector has checked
+   * the directive's data-bound properties for the first time,
+   * and before any of the view or content children have been checked.
+   * It is invoked only once when the directive is instantiated.
+   */
   ngOnInit() {
     this.route.data.subscribe(data => {
       this.user = data['user'];

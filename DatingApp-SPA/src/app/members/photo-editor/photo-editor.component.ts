@@ -5,7 +5,6 @@ import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
-import { error } from 'protractor';
 
 @Component({
   selector: 'app-photo-editor',
@@ -26,6 +25,12 @@ export class PhotoEditorComponent implements OnInit {
     private alertify: AlertifyService
   ) {}
 
+  /**
+   * A callback method that is invoked immediately after the default change detector has checked
+   * the directive's data-bound properties for the first time,
+   * and before any of the view or content children have been checked.
+   * It is invoked only once when the directive is instantiated.
+   */
   ngOnInit() {
     this.initializeUploader();
   }
@@ -34,6 +39,9 @@ export class PhotoEditorComponent implements OnInit {
     this.hasBaseDropZoneOver = e;
   }
 
+  /**
+   * Initializes uploader
+   */
   initializeUploader() {
     this.uploader = new FileUploader({
       url:
@@ -63,28 +71,46 @@ export class PhotoEditorComponent implements OnInit {
           description: res.description,
           isMain: res.isMain
         };
-
         this.photos.push(photo);
+        // Logic to update newly added photo for newly registered user
+        if (photo.isMain) {
+          this.authService.changeMemberPhoto(photo.url);
+          this.authService.currentUser.photoUrl = photo.url;
+
+          // updates user model in local storage
+          localStorage.setItem(
+            'user',
+            JSON.stringify(this.authService.currentUser)
+          );
+        }
       }
     };
   }
 
+  /**
+   * Sets main photo for the user
+   * @param photo Photo data model
+   */
   setMainPhoto(photo: Photo) {
     this.userService
+      // passes user id and photo id to the backend
       .setMainPhoto(this.authService.decodedToken.nameid, photo.id)
       .subscribe(
         () => {
           this.currentMain = this.photos.filter(p => p.isMain === true)[0];
           this.currentMain.isMain = false;
+          // Updates photo model
           photo.isMain = true;
+
           this.authService.changeMemberPhoto(photo.url);
           this.authService.currentUser.photoUrl = photo.url;
+
+          // updates user model in local storage
           localStorage.setItem(
             'user',
             JSON.stringify(this.authService.currentUser)
           );
         },
-        // tslint:disable-next-line: no-shadowed-variable
         error => {
           this.alertify.error(error);
         }

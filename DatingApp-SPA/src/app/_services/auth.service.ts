@@ -17,6 +17,7 @@ export class AuthService {
   decodedToken: any;
   currentUser: User;
 
+  // TODO : Read about BehaviorSubject in RxJs
   photoUrl = new BehaviorSubject<string>('../../assets/user.png');
   currentPhotoUrl = this.photoUrl.asObservable();
 
@@ -41,8 +42,8 @@ export class AuthService {
     );
   }
 
-  register(model: any) {
-    return this.http.post(this.baseUrl + 'auth/register', model);
+  register(user: User) {
+    return this.http.post(this.baseUrl + 'auth/register', user);
   }
 
   loggedIn() {
