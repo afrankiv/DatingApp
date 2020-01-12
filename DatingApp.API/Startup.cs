@@ -28,16 +28,23 @@ namespace DatingApp.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // EntityFrameworkServiceCollectionExtensions
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            // MvcServiceCollectionExtensions
             services.AddControllers().AddNewtonsoftJson(opt =>
             {
                 opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
+            // CorsServiceCollectionExtensions
             services.AddCors();
+            // OptionsConfigurationServiceCollectionExtensions
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
+            // AutoMapper Extensions
             services.AddAutoMapper(typeof(DatingRepository).Assembly);
+            // ServiceCollectionServiceExtensions - AddScoped - creates instances per request
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IDatingRepository, DatingRepository>();
+            // AuthenticationServiceCollectionExtensions
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -50,6 +57,8 @@ namespace DatingApp.API
                         ValidateAudience = false
                     };
                 });
+            // AddScoped - creates instances per request
+            services.AddScoped<LogUserActivity>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
