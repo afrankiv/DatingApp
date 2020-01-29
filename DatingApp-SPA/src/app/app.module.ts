@@ -10,7 +10,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   BsDropdownModule,
   TabsModule,
-  BsDatepickerModule
+  BsDatepickerModule,
+  PaginationModule,
+  ButtonsModule
 } from 'ngx-bootstrap';
 import { RouterModule } from '@angular/router';
 import { JwtModule } from '@auth0/angular-jwt';
@@ -39,6 +41,7 @@ import { MemberEditComponent } from './members/member-edit/member-edit.component
 import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
+import { SandboxComponent } from './sandbox/sandbox.component';
 
 export function tokenGetter() {
   return localStorage.getItem('token');
@@ -51,41 +54,52 @@ export class CustomHammerConfig extends HammerGestureConfig {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NavComponent,
-    HomeComponent,
-    RegisterComponent,
-    MemberListComponent,
-    ListsComponent,
-    MessagesComponent,
-    MemberCardComponent,
-    MemberDetailComponent,
-    MemberEditComponent,
-    PhotoEditorComponent,
-    TimeAgoPipe
+   declarations: [ // Custom Components
+      AppComponent,
+      NavComponent,
+      HomeComponent,
+      RegisterComponent,
+      MemberListComponent,
+      ListsComponent,
+      MessagesComponent,
+      MemberCardComponent,
+      MemberDetailComponent,
+      MemberEditComponent,
+      PhotoEditorComponent,
+      TimeAgoPipe,
+      SandboxComponent
+   ],
+   imports: [ // External libraries: Modules
+      BrowserModule,
+      BrowserAnimationsModule,
+      // Angular HTTP Client: COMMUNICATION
+      HttpClientModule,
+      // Angular Forms: FORMS
+      FormsModule,
+      ReactiveFormsModule,
+      // ngx-bootstrap - Angular Bootstrap Library: UI
+      BsDropdownModule.forRoot(),
+      BsDatepickerModule.forRoot(),
+      PaginationModule.forRoot(),
+      TabsModule.forRoot(),
+      ButtonsModule.forRoot(),
+      // ngx-bootstrap - end
+      // Angular Router: NAVIGATION
+      RouterModule.forRoot(appRoutes),
+      // auth0/angular-jwt library: SECURITY
+      JwtModule.forRoot({
+        config: {
+          tokenGetter,
+          whitelistedDomains: ['localhost:5000'],
+          blacklistedRoutes: ['localhost:5000/api/auth']
+        }
+      }),
+      // ngx-gallery library: UI
+      NgxGalleryModule,
+      // ng2-file-upload library: UI
+      FileUploadModule
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    FormsModule,
-    ReactiveFormsModule,
-    BsDropdownModule.forRoot(),
-    BsDatepickerModule.forRoot(),
-    TabsModule.forRoot(),
-    RouterModule.forRoot(appRoutes),
-    JwtModule.forRoot({
-      config: {
-        tokenGetter,
-        whitelistedDomains: ['localhost:5000'],
-        blacklistedRoutes: ['localhost:5000/api/auth']
-      }
-    }),
-    NgxGalleryModule,
-    FileUploadModule
-  ],
-  providers: [
+  providers: [ // Custom Services, Provides...
     ErrorInterceptorProvider,
     AuthService,
     AlertifyService,

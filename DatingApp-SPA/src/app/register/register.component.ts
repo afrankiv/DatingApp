@@ -57,9 +57,10 @@ export class RegisterComponent implements OnInit {
   }
 
   /**
-   * Angular reactive form definition with attributes validation.
+   * ANGULAR: Reactive form definition with attributes validation.
    */
   createRegisterForm() {
+    // ANGULAR: Form Builder is used
     this.registerForm = this.fb.group(
       {
         gender: ['male'],
@@ -78,6 +79,7 @@ export class RegisterComponent implements OnInit {
         ],
         confirmPassword: ['', Validators.required]
       },
+      // ANGULAR: Custom validator
       { validator: this.passwordMatchValidator }
     );
   }

@@ -20,29 +20,55 @@ namespace DatingApp.API.Controllers
         private readonly IDatingRepository _repo;
 
         private readonly IMapper _mapper;
-        
+
         public UsersController(IDatingRepository repo, IMapper mapper)
         {
             _mapper = mapper;
             _repo = repo;
         }
 
+        /// <summary>
+        /// GET: Returns users collection and pagination headers, based on query parameters
+        /// </summary>
+        /// <param name="userParams">Request parameters passesd as query string</param>
+        /// <returns>Users collection and response headers with pagination info</returns>
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
         {
-            // ARCH: Repository Interface Access -> Returns ORM model, but var hides the typing
-            var users = await _repo.GetUsers();
+            // System.Security.Claims.ClaimTypes
+            // ClaimsPrincipal ControllerBase.User -> Gets the System.Security.Claims.ClaimsPrincipal for user associated with the executing action.
+            // Logged in User
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var userFromRepo = await _repo.GetUser(currentUserId);
+            // Attach user id to user params on the server side
+            userParams.UserId = currentUserId;
+
+            if (string.IsNullOrEmpty(userParams.Gender))
+            {
+                userParams.Gender = userFromRepo.Gender == "male" ? "female" : "male";
+            }
+
+            // ARCH: Repository Interface Access -> Returns custom PagedList collection
+            var users = await _repo.GetUsers(userParams);
+
             // ARCH: Maps ORM Models into DTOs, but DTO is designed for the use case
             var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
 
+            // ARCH: Add additional metadata(pagination) about users collection into HTTP Response Headers
+            Response.AddPagination(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+
+            // Microsoft.AspNetCore.Mvc(WebApi):ControllerBase:
+            // Returns serialized collection in response with status code 200:OK
             return Ok(usersToReturn);
         }
 
-        [HttpGet("{id}", Name="GetUser")]
+        [HttpGet("{id}", Name = "GetUser")]
         public async Task<IActionResult> GetUser(int id)
         {
             // ARCH: Repository Interface Access -> Returns ORM model, but var hides the typing
             var user = await _repo.GetUser(id);
+
             // ARCH: Maps ORM Models into DTOs, but DTO is designed for the use case
             var userToReturn = _mapper.Map<UserForDetailedDto>(user);
 

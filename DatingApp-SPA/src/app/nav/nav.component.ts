@@ -49,6 +49,7 @@ export class NavComponent implements OnInit {
   }
 
   logout() {
+    // LOCAL STORAGE: Remove token and user on log out method.
     localStorage.removeItem('token');
     localStorage.removeItem('user');
 

@@ -10,6 +10,7 @@ import { MemberListResolver } from './_resolvers/member-list.resolver';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
+import { SandboxComponent } from './sandbox/sandbox.component';
 
 export const appRoutes: Routes = [
   // Case: Empty URL will go to home page
@@ -36,6 +37,7 @@ export const appRoutes: Routes = [
         resolve: { user: MemberEditResolver },
         canDeactivate: [PreventUnsavedChanges]
       },
+      { path: 'sandbox', component: SandboxComponent },
       { path: 'messages', component: MessagesComponent },
       { path: 'lists', component: ListsComponent }
     ]
