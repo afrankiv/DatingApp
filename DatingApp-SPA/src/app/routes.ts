@@ -11,6 +11,7 @@ import { MemberEditComponent } from './members/member-edit/member-edit.component
 import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
 import { SandboxComponent } from './sandbox/sandbox.component';
+import { ListsResolver } from './_resolvers/lists.resolver';
 
 export const appRoutes: Routes = [
   // Case: Empty URL will go to home page
@@ -18,6 +19,7 @@ export const appRoutes: Routes = [
   // Case: Empty home, but with children
   {
     path: '',
+    // ANGULAR: Navigation guards and resolvers.
     runGuardsAndResolvers: 'always',
     canActivate: [AuthGuard],
     children: [
@@ -39,7 +41,11 @@ export const appRoutes: Routes = [
       },
       { path: 'sandbox', component: SandboxComponent },
       { path: 'messages', component: MessagesComponent },
-      { path: 'lists', component: ListsComponent }
+      {
+        path: 'lists',
+        component: ListsComponent,
+        resolve: { users: ListsResolver }
+      }
     ]
   },
   // Case: Invalid URL will redirect to home page
