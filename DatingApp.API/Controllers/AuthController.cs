@@ -61,7 +61,7 @@ namespace DatingApp.API.Controllers
                 return Unauthorized();
 
             // Security token creation logic
-            var claims = new[]
+            Claim[] claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
                 new Claim(ClaimTypes.Name, userFromRepo.Username)
@@ -70,18 +70,21 @@ namespace DatingApp.API.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(_config.GetSection("AppSettings:Token").Value));
 
+            // Microsoft.IdentityModel.Tokens.SymmetricSecurityKey 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+            // Microsoft.IdentityModel.Tokens.SecurityTokenDescriptor
+            // Contains some information which used to create a security token.
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = creds
             };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            // A Microsoft.IdentityModel.Tokens.SecurityTokenHandler designed for creating and validating Json Web Tokens. 
+            SecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            // Microsoft.IdentityModel.Tokens.SecurityToken
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
 
             var user = _mapper.Map<UserForListDto>(userFromRepo);
 

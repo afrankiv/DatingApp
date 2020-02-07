@@ -7,10 +7,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DatingApp.API.Helpers
 {
+    /// <summary>
+    /// Set LastActive property in user record and store in database through ORM.
+    /// </summary>
     public class LogUserActivity : IAsyncActionFilter
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            // next -> ActionExecutionDelegate
+            // resultContext -> ActionExecutedContext
             var resultContext = await next();
             
             // Gets user id from security context in HttpContext

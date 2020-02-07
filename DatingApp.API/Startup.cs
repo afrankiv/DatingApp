@@ -30,6 +30,7 @@ namespace DatingApp.API
         {
             // EntityFrameworkServiceCollectionExtensions
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            
             // MvcServiceCollectionExtensions
             services.AddControllers().AddNewtonsoftJson(opt =>
             {

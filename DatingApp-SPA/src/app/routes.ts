@@ -12,6 +12,8 @@ import { MemberEditResolver } from './_resolvers/member-edit.resolver';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
 import { SandboxComponent } from './sandbox/sandbox.component';
 import { ListsResolver } from './_resolvers/lists.resolver';
+import { ChatbotComponent } from './chatbot/chatbot.component';
+import { MessagesResolver } from './_resolvers/messages.resolver';
 
 export const appRoutes: Routes = [
   // Case: Empty URL will go to home page
@@ -39,8 +41,13 @@ export const appRoutes: Routes = [
         resolve: { user: MemberEditResolver },
         canDeactivate: [PreventUnsavedChanges]
       },
+      { path: 'chatbot', component: ChatbotComponent },
       { path: 'sandbox', component: SandboxComponent },
-      { path: 'messages', component: MessagesComponent },
+      {
+        path: 'messages',
+        component: MessagesComponent,
+        resolve: { messages: MessagesResolver }
+      },
       {
         path: 'lists',
         component: ListsComponent,

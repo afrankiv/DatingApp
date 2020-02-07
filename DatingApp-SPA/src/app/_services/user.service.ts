@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { User } from '../_models/user';
 import { PaginatedResult } from '../_models/pagination';
 import { map } from 'rxjs/operators';
+import { Message } from '../_models/message';
 
 /**
  * ANGULAR Service: frontend communication to backend REST Web API
@@ -124,6 +125,72 @@ export class UserService {
   public sendLike(id: number, recipientId: number) {
     return this.http.post(
       this.baseUrl + 'users/' + id + '/like/' + recipientId,
+      {}
+    );
+  }
+
+  /**
+   * GET loads messages from server based on query string parameters
+   * @param id user id
+   * @param [page] page number
+   * @param [itemsPerPage] records per page
+   * @param [messageContainer] type of messages
+   * @returns messages collection of messages with pagination information
+   */
+  public getMessages(
+    id: number,
+    page?,
+    itemsPerPage?,
+    messageContainer?
+  ): Observable<PaginatedResult<Message[]>> {
+    const paginatedResult: PaginatedResult<Message[]> = new PaginatedResult<
+      Message[]
+    >();
+
+    let params = new HttpParams();
+    params = params.append('messageContainer', messageContainer);
+
+    if (page != null && itemsPerPage != null) {
+      params = params.append('pageNumber', page);
+      params = params.append('pageSize', itemsPerPage);
+    }
+
+    return (
+      this.http
+        .get<Message[]>(this.baseUrl + 'users/' + id + '/messages', {
+          observe: 'response',
+          params
+        })
+        // Observable handling
+        .pipe(
+          // Response handling and parsing body + headers
+          map(response => {
+            paginatedResult.result = response.body;
+
+            if (response.headers.get('Pagination') !== null) {
+              paginatedResult.pagination = JSON.parse(
+                response.headers.get('Pagination')
+              );
+            }
+            return paginatedResult;
+          })
+        )
+    );
+  }
+
+  public getMessageThread(id: number, recipientId: number) {
+    return this.http.get<Message[]>(
+      this.baseUrl + 'users/' + id + '/messages/thread/' + recipientId
+    );
+  }
+
+  public sendMessage(id: number, message: Message) {
+    return this.http.post(this.baseUrl + 'users/' + id + '/messages', message);
+  }
+
+  public deleteMessage(id: number, userId: number) {
+    return this.http.post(
+      this.baseUrl + 'users/' + userId + '/messages/' + id,
       {}
     );
   }
