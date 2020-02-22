@@ -25,12 +25,35 @@ namespace DatingApp.API
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        /// <summary>
+        /// This method is convetion based and will be automatically executed depending on the mode DEV/PROD
+        /// </summary>
+        /// <param name="services"></param>ß
+        public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             // EntityFrameworkServiceCollectionExtensions
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            
+
+            ConfigureServices(services);
+        }
+
+        /// <summary>
+        /// This method is convetion based and will be automatically executed depending on the mode DEV/PROD
+        /// </summary>
+        /// <param name="services"></param>
+        public void ConfigureProductionServices(IServiceCollection services)
+        {
+            // EntityFrameworkServiceCollectionExtensions
+            services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            ConfigureServices(services);
+        }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             // MvcServiceCollectionExtensions
             services.AddControllers().AddNewtonsoftJson(opt =>
             {
@@ -85,9 +108,10 @@ namespace DatingApp.API
                         }
                     });
                 });
+                app.UseHsts();
             }
-
-            // app.UseHttpsRedirection();
+            
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
@@ -96,9 +120,13 @@ namespace DatingApp.API
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapFallbackToController("Index", "Fallback");
             });
         }
     }
